@@ -7,7 +7,6 @@ from perzeptron import Perzeptron
 #print("Value of a: ")
 #print(a)
 
-p = Perzeptron()
 #print(p.f())
 
 """
@@ -28,19 +27,24 @@ y = np.array([y_one, y_two])
 w = np.array([-1, 0])
 r = 1
 
+p = Perzeptron(w, r)
+
 #Predict
-prediction = p.activating_function(x_three, w)
+prediction = p.activating_function(x_three)
 print('Before Training Prediction for x three was class:' + str(prediction))
 
 #Train
-w = p.weight_new(x_one, y_one, w, r)
+w = p.weight_new(x_one, y_one)
 print('New w is now:' + str(w))
-w = p.weight_new(x_two, y_two, w, r)
+w = p.weight_new(x_two, y_two)
 print('New w is now:' + str(w))
 
 
 #Predict
-prediction = p.activating_function(x_three, w)
+prediction = p.activating_function(x_three)
 print('Prediction for x three was class:' + str(prediction))
 
-#p.train(x, y)
+print("----Now using Training Function----")
+w = np.array([-1, 0])
+p2 = Perzeptron(w, r)
+p2.train(x, y)
