@@ -1,9 +1,7 @@
 import numpy as np
-import sklearn as sk
 from random import randint
-
 from sklearn.model_selection import train_test_split
-
+from sklearn import datasets
 from perzeptron import Perzeptron
 
 #print("Hello World!")
@@ -69,7 +67,7 @@ def aufgabe_01():
 
 def aufgabe_02_03():
     number_of_features = 3;
-    dimension = 1000;
+    dimension = 10000;
 
     print('---Now Generating Data...---')
     generated_data_matrix = Perzeptron.generate(number_of_features, dimension)
@@ -106,4 +104,52 @@ def aufgabe_02_03():
     accuracy = (1 - error/number_of_predictions) * 100
     print('Accuracy: ' + str(accuracy) + '%')
     print('Error Prob: ' + str(100 - accuracy) + '%')
-aufgabe_02_03()
+
+def aufgabe_04():
+    print('---Evaluation mit Iris-Flower-Datasets---')
+    iris = datasets.load_iris()
+    #for keys in iris.keys() :
+    #    print(keys)
+    split = 0;
+    for i in iris.target:
+        if iris.target[i] <= 1:
+            split = split + 1
+
+    X=iris.data[:100, :]
+    y=iris.target[:100]#Ab hier fangen die anderen blumen an
+
+    #print(y)
+    print("---Starte Test Train split---")
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+    #print('X_train: ' + str(X_train))
+    #print('X_test: ' + str(X_test))
+    print('y_train: ' + str(y_train))
+    #print('y_test: ' + str(X_test))
+    print("---Starte Training---")
+    number_of_features = X_train.shape[1]
+    #w_init = np.zeros(number_of_features)
+    w_init = np.random.uniform(-1, 1, number_of_features)
+    """for n in range(number_of_features):
+        w_init[n] = np.array([randint(-10, 10)])#-> Randmoisierung von initialem w auch ausschlaggebend, wie viel durch wenige daten angepasst werden kann
+    """
+    my_fresh_p = Perzeptron(w_init, 0.01)#-> Muss deutlich höher geschraubt werden als 0.01, da nicht so viele Train Daten vorhanden sind.
+    my_fresh_p.train(np.transpose(X_train), y_train)
+    my_fresh_p.show_information()
+
+    print('---Starting evaluation---')
+    y_predictions = my_fresh_p.infer(np.transpose(X_test))
+    print("y_test data: " + str(y_test))
+    print("y_predictions: " + str(y_predictions))
+    error = 0;
+    number_of_predictions = y_test.shape[0]
+    for d in range(number_of_predictions):
+        if y_predictions[d] != y_test[d]:
+            error = error + 1
+    print('---Finished evaluation---')
+    accuracy = (1 - error/number_of_predictions) * 100
+    print('Accuracy: ' + str(accuracy) + '%')
+    print('Error Prob: ' + str(100 - accuracy) + '%')
+
+#aufgabe_01()
+#aufgabe_02_03()
+aufgabe_04()

@@ -61,7 +61,7 @@ class Perzeptron:
         #print("Shape x:" + str(x.shape))
         for k in range(x.shape[1]):#Schnappt sich Eizelne Zeilen aus der Matrix x. Die einzelnen Zeilen haben n Spalten/Features
             self.weight_new(x[:, k], y[k])#TODO: So richtig? Müssen hier Zeilen oder doch Spalten von X verwendet werden?
-            print('New w is now:' + str(self.w))
+            #print('New w is now:' + str(self.w))
 
     @staticmethod
     def generate(number_of_features, dimension):
@@ -83,3 +83,7 @@ class Perzeptron:
                 else:
                     matrix[n, d] = randint(-100, 100)
         return matrix
+
+    def show_information(self):
+        print('Perzeptron has weight of ' + str(self.w)
+              + ' and learn rate ' + str(self.r) + '...')
