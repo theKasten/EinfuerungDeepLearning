@@ -11,8 +11,15 @@ class Perzeptron:
         print('Perzeptron has been initialised with initial weight of ' + str(self.w)
               + ' and initial learn rate ' + str(self.r) + '...')
 
-    def f(self):
-        print('Do nothing')
+    def infer(self, x):
+        """
+        INPUT
+        x -> Eingabe Vektor
+        RETURN
+        Soll Klasse ausgeben in das Perzeptron den Eingabevektor laut seinen internen Gewichten stecken würde
+        """
+        return self.activating_function(x)
+
     def activating_function(self, x):
         """
         INPUT:
@@ -43,7 +50,8 @@ class Perzeptron:
 
     def train(self, x, y):
         #x = np.array(x_in)
-        print("Shape x:" + str(x.shape))
+        #print("Shape x:" + str(x.shape))
         for k in range(x.shape[1]):
             self.weight_new(x[k, :], y[k])#TODO: So richtig? Müssen hier Reihen oder doch Spalten von X verwendet werden?
-            #print('New w is now:' + str(self.w))
+            print('New w is now:' + str(self.w))
+

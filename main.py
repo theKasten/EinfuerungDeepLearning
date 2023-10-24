@@ -44,6 +44,7 @@ print('New w is now:' + str(w))
 prediction = p.activating_function(x_three)
 print('Prediction for x three was class:' + str(prediction))
 
+print()
 print("----Now using Training Function----")
 w = np.array([-1, 0])
 p2 = Perzeptron(w, r)
