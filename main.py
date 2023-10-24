@@ -68,19 +68,42 @@ def aufgabe_01():
     print('Lables: ' + str(p3.infer(x_test)))
 
 def aufgabe_02_03():
+    number_of_features = 3;
+    dimension = 1000;
+
     print('---Now Generating Data...---')
-    generated_data_matrix = Perzeptron.generate(10, 10)
-    print(generated_data_matrix)
-    generated_x = generated_data_matrix[:10, :];
-    generated_y = generated_data_matrix[10, :]
-    print('X: ' + str(generated_x))
-    print('Y: ' + str(generated_y))
+    generated_data_matrix = Perzeptron.generate(number_of_features, dimension)
+    #print(generated_data_matrix)
+    generated_x = generated_data_matrix[:number_of_features, :]
+    generated_y = generated_data_matrix[number_of_features, :]
+    #print('X: ' + str(generated_x) + '\nX.shape: ' + str(generated_x.shape))
+    #print('Y: ' + str(generated_y) + '\nY.shape: ' + str(generated_y.shape))
 
     print('---Starting Test Train Split---')
-    X_train, X_test, y_train, y_test = train_test_split(generated_x, generated_y, test_size=0.33, random_state=42)
-    print('X_train: ' + str(X_train))
-    print('X_test: ' + str(X_test))
-    print('y_train: ' + str(y_train))
-    print('y_test: ' + str(X_test))
+    X_train, X_test, y_train, y_test = train_test_split(np.transpose(generated_x), generated_y, test_size=0.33, random_state=42)
+    #print('X_train: ' + str(X_train))
+    #print('X_test: ' + str(X_test))
+    #print('y_train: ' + str(y_train))
+    #print('y_test: ' + str(X_test))
 
-aufgabe_02_03() 
+    print('---Starting Training---')
+    w_init = np.zeros(number_of_features)
+    for n in range(number_of_features):
+        w_init[n] = np.array([randint(-100, 100)])
+    my_freshly_trained_p = Perzeptron(w_init, 0.01)
+    my_freshly_trained_p.train(np.transpose(X_train), y_train)
+
+    print('---Starting evaluation---')
+    y_predictions = my_freshly_trained_p.infer(np.transpose(X_test))
+    #print("y_test data: " + str(y_test))
+    #print("y_predictions: " + str(y_predictions))
+    error = 0;
+    number_of_predictions = y_test.shape[0]
+    for d in range(number_of_predictions):
+        if y_predictions[d] != y_test[d]:
+            error = error + 1
+    print('---Finished evaluation---')
+    accuracy = (1 - error/number_of_predictions) * 100
+    print('Accuracy: ' + str(accuracy) + '%')
+    print('Error Prob: ' + str(100 - accuracy) + '%')
+aufgabe_02_03()
