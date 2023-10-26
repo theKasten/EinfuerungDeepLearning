@@ -115,7 +115,7 @@ def aufgabe_04():
             error = error + 1
     #Finished evaluation
     accuracy = (1 - error/number_of_predictions) * 100
-    print('Accuracy: Aufgabe 4: ' + str(accuracy) + '%')
+    print('Accuracy Aufgabe 4: ' + str(accuracy) + '%')
 
 def visualisierung_generator():
     number_of_features = 2;
@@ -201,7 +201,7 @@ def visualisierung_iris():
     accuracy = (1 - error/number_of_predictions) * 100
     print('Accuracy: ' + str(accuracy) + '%')
 
-def bias_einbauen():
+def visualisierung_mit_bias():
     print("---Bias einbauen---")
     number_of_features = 2;
     dimension = 100;
@@ -277,4 +277,4 @@ def bias_einbauen():
 #aufgabe_01()
 aufgabe_02_03()
 aufgabe_04()
-#bias_einbauen()
+#visualisierung_mit_bias()
