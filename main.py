@@ -1,8 +1,11 @@
 import numpy as np
+import matplotlib.pyplot as plt
+
 from random import randint
 from sklearn.model_selection import train_test_split
 from sklearn import datasets
 from perzeptron import Perzeptron
+
 
 #print("Hello World!")
 #a = np.arange(15).reshape(3, 5)
@@ -62,14 +65,14 @@ def aufgabe_01():
     print()
     print("---Now using Testing for training---")
     p3 = Perzeptron(np.array([randint(-10, 10), randint(-10, 10)]), r)#Mit zufälligem w
-    p3.train(x_test, np.array([1, 1, 0]))
+    p3.train(np.transpose(x_test), np.array([1, 1, 0]))
     print('Lables: ' + str(p3.infer(x_test)))
 
 def aufgabe_02_03():
     number_of_features = 3;
     dimension = 10000;
 
-    print('---Now Generating Data...---')
+    #print('---Now Generating Data...---')
     generated_data_matrix = Perzeptron.generate(number_of_features, dimension)
     #print(generated_data_matrix)
     generated_x = generated_data_matrix[:number_of_features, :]
@@ -77,21 +80,19 @@ def aufgabe_02_03():
     #print('X: ' + str(generated_x) + '\nX.shape: ' + str(generated_x.shape))
     #print('Y: ' + str(generated_y) + '\nY.shape: ' + str(generated_y.shape))
 
-    print('---Starting Test Train Split---')
+    #print('---Starting Test Train Split---')
     X_train, X_test, y_train, y_test = train_test_split(np.transpose(generated_x), generated_y, test_size=0.33, random_state=42)
     #print('X_train: ' + str(X_train))
     #print('X_test: ' + str(X_test))
     #print('y_train: ' + str(y_train))
     #print('y_test: ' + str(X_test))
 
-    print('---Starting Training---')
-    w_init = np.zeros(number_of_features)
-    for n in range(number_of_features):
-        w_init[n] = np.array([randint(-100, 100)])
+    #print('---Starting Training---')
+    w_init = np.random.uniform(-1, 1, number_of_features)
     my_freshly_trained_p = Perzeptron(w_init, 0.01)
-    my_freshly_trained_p.train(np.transpose(X_train), y_train)
+    my_freshly_trained_p.train(X_train, y_train)
 
-    print('---Starting evaluation---')
+    #print('---Starting evaluation---')
     y_predictions = my_freshly_trained_p.infer(np.transpose(X_test))
     #print("y_test data: " + str(y_test))
     #print("y_predictions: " + str(y_predictions))
@@ -100,32 +101,26 @@ def aufgabe_02_03():
     for d in range(number_of_predictions):
         if y_predictions[d] != y_test[d]:
             error = error + 1
-    print('---Finished evaluation---')
+    #print('---Finished evaluation---')
     accuracy = (1 - error/number_of_predictions) * 100
-    print('Accuracy: ' + str(accuracy) + '%')
-    print('Error Prob: ' + str(100 - accuracy) + '%')
+    print('Accuracy Aufgabe 3: ' + str(accuracy) + '%')
+    #print('Error Prob: ' + str(100 - accuracy) + '%')
 
 def aufgabe_04():
-    print('---Evaluation mit Iris-Flower-Datasets---')
+    #print('---Evaluation mit Iris-Flower-Datasets---')
     iris = datasets.load_iris()
-    #for keys in iris.keys() :
-    #    print(keys)
-    split = 0;
-    for i in iris.target:
-        if iris.target[i] <= 1:
-            split = split + 1
 
     X=iris.data[:100, :]
     y=iris.target[:100]#Ab hier fangen die anderen blumen an
 
     #print(y)
-    print("---Starte Test Train split---")
+    #print("---Starte Test Train split---")
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
     #print('X_train: ' + str(X_train))
     #print('X_test: ' + str(X_test))
-    print('y_train: ' + str(y_train))
+    #print('y_train: ' + str(y_train))
     #print('y_test: ' + str(X_test))
-    print("---Starte Training---")
+    #print("---Starte Training---")
     number_of_features = X_train.shape[1]
     #w_init = np.zeros(number_of_features)
     w_init = np.random.uniform(-1, 1, number_of_features)
@@ -133,13 +128,54 @@ def aufgabe_04():
         w_init[n] = np.array([randint(-10, 10)])#-> Randmoisierung von initialem w auch ausschlaggebend, wie viel durch wenige daten angepasst werden kann
     """
     my_fresh_p = Perzeptron(w_init, 0.01)#-> Muss deutlich höher geschraubt werden als 0.01, da nicht so viele Train Daten vorhanden sind.
-    my_fresh_p.train(np.transpose(X_train), y_train)
-    my_fresh_p.show_information()
+    my_fresh_p.train(X_train, y_train)
+    #my_fresh_p.show_information()
 
-    print('---Starting evaluation---')
+    #print('---Starting evaluation---')
     y_predictions = my_fresh_p.infer(np.transpose(X_test))
-    print("y_test data: " + str(y_test))
-    print("y_predictions: " + str(y_predictions))
+    #print("y_test data: " + str(y_test))
+    #print("y_predictions: " + str(y_predictions))
+    error = 0;
+    number_of_predictions = y_test.shape[0]
+    for d in range(number_of_predictions):
+        if y_predictions[d] != y_test[d]:
+            error = error + 1
+    #print('---Finished evaluation---')
+    accuracy = (1 - error/number_of_predictions) * 100
+    print('Accuracy: Aufgabe 4: ' + str(accuracy) + '%')
+    #print('Error Prob: ' + str(100 - accuracy) + '%')
+
+
+def visualisierung_generator():
+    number_of_features = 2;
+    dimension = 1000;
+
+    print('---Now Generating Data...---')
+    generated_data_matrix = Perzeptron.generate(number_of_features, dimension)
+    #print(generated_data_matrix)
+    generated_x = generated_data_matrix[:number_of_features, :]
+    generated_y = generated_data_matrix[number_of_features, :]
+
+    X_train, X_test, y_train, y_test = train_test_split(np.transpose(generated_x), generated_y, test_size=0.33, random_state=42)
+    number_of_features = X_train.shape[1]
+    w_init = np.random.uniform(-1, 1, number_of_features)
+    my_fresh_p = Perzeptron(w_init, 0.01)#-> Muss deutlich höher geschraubt werden als 0.01, da nicht so viele Train Daten vorhanden sind.
+    my_fresh_p.train(X_train, y_train)
+
+    print('---Visualisiere---')
+    fig, ax = plt.subplots()
+    ax.grid()
+    ax.set(xlim = (-100, 100), ylim = (-100, 100))
+    ax.scatter(X_train[:, 0], X_train[:, 1], c = y_train, marker='x')
+    ax.scatter(X_test[:, 0], X_test[:, 1], c = y_test, marker='*')
+
+    #bias, weight = 0, my_fresh_p.w
+    slope = my_fresh_p.w[1] / my_fresh_p.w[0]
+    intercept = 0;
+    print(my_fresh_p.w)
+    ax.plot(boundary_x := np.linspace(-200, 200, 2), slope * boundary_x + intercept)
+
+    y_predictions = my_fresh_p.infer(np.transpose(X_test))
     error = 0;
     number_of_predictions = y_test.shape[0]
     for d in range(number_of_predictions):
@@ -148,8 +184,126 @@ def aufgabe_04():
     print('---Finished evaluation---')
     accuracy = (1 - error/number_of_predictions) * 100
     print('Accuracy: ' + str(accuracy) + '%')
-    print('Error Prob: ' + str(100 - accuracy) + '%')
+
+    plt.show()
+
+def visualisierung_iris():
+    iris = datasets.load_iris()
+
+    X=iris.data[:100, :]
+    y=iris.target[:100]#Ab hier fangen die anderen blumen a
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+
+    number_of_features = X_train.shape[1]
+    w_init = np.random.uniform(-1, 1, number_of_features)
+    my_fresh_p = Perzeptron(w_init, 0.01)#-> Muss deutlich höher geschraubt werden als 0.01, da nicht so viele Train Daten vorhanden sind.
+    my_fresh_p.train(X_train, y_train)
+
+    print('---Visualisiere---')
+    fig, ax = plt.subplots()
+    ax.grid()
+    ax.set(xlim = (-10, 10), ylim = (-10, 10))
+    ax.scatter(X_train[:, 0], X_train[:, 1], c = y_train, marker='x')
+    #ax.scatter(X_test[:, 0], X_test[:, 1], c = y_test, marker='*')
+
+
+    #bias, weight = 0, my_fresh_p.w[1:]
+    print(my_fresh_p.w)
+    slope = my_fresh_p.w[0] / my_fresh_p.w[1]
+    #intercept = my_fresh_p.w[0] / my_fresh_p.w[1]
+    intercept = 0
+
+    ax.plot(boundary_x := np.linspace(0, 2, 2), slope * boundary_x + intercept)
+    #ax.arrow(bias/weight[0], 0, weight[0], weight[1], width=.03, length_includes_head=True)
+
+
+    plt.show()
+
+    y_predictions = my_fresh_p.infer(np.transpose(X_test))
+    error = 0;
+    number_of_predictions = y_test.shape[0]
+    for d in range(number_of_predictions):
+        if y_predictions[d] != y_test[d]:
+            error = error + 1
+    print('---Finished evaluation---')
+    accuracy = (1 - error/number_of_predictions) * 100
+    print('Accuracy: ' + str(accuracy) + '%')
+
+def bias_einbauen():
+    print("---Bias einbauen---")
+    number_of_features = 2;
+    dimension = 100;
+
+    print('---Now Generating Data...---')
+    generated_data_matrix = Perzeptron.generate(number_of_features, dimension)
+    #print(generated_data_matrix)
+    generated_x = generated_data_matrix[:number_of_features, :]
+    generated_y = generated_data_matrix[number_of_features, :]
+
+    X_train, X_test, y_train, y_test = train_test_split(np.transpose(generated_x), generated_y, test_size=0.33, random_state=42)
+
+    number_of_features = X_train.shape[1] + 1##affine + 1
+    w_init = np.random.uniform(-1, 1, number_of_features)
+    my_fresh_p = Perzeptron(w_init, 0.01)
+
+    affine_x_train = my_fresh_p.to_affine(X_train);
+    #print(affine_x_train)
+    my_fresh_p.train(affine_x_train, y_train)
+
+
+    print('---Visualisiere---')
+    fig, ax = plt.subplots()
+    ax.grid()
+    ax.set(xlim = (-100, 100), ylim = (-100, 100))
+    ax.scatter(affine_x_train[:, 1], affine_x_train[:, 2], c = y_train, marker='x')
+    #print(y_test)
+    ax.scatter(Perzeptron.to_affine(X_test)[:, 1], Perzeptron.to_affine(X_test)[:, 2], c = y_test, marker='*')
+
+    #ax.plot(boundary_x := np.linspace(0, 2, 2), 0 * boundary_x + 0)
+
+    ax.arrow(0, 0, my_fresh_p.w[1]*20, my_fresh_p.w[2]*20, width=2, length_includes_head=False)
+    slope = - my_fresh_p.w[1] / my_fresh_p.w[2]
+    ax.plot(boundary_x := np.linspace(-100, 100, 2), slope * boundary_x + 0)
+
+
+    #print(my_fresh_p.w)
+
+
+
+    #ax.arrow(bias/weight[0], 0, weight[0], weight[1], width=.03, length_includes_head=True)
+
+    #fig2, ax2 = plt.subplots()
+    #ax2.grid()
+    #ax2.set(xlim = (-1, 8), ylim = (-1, 8))
+    y_predictions = my_fresh_p.infer(np.transpose(Perzeptron.to_affine(X_test)))
+    print(y_predictions)
+    affine_x_test = my_fresh_p.to_affine(X_test);
+    #ax2.scatter(affine_x_test[:, 1], affine_x_test[:, 2], c = y_predictions, marker='x')
+
+    bias, weight = -my_fresh_p.w[0], my_fresh_p.w[1:]
+    #print(my_fresh_p.w)
+    slope = - my_fresh_p.w[0] / my_fresh_p.w[1]
+    intercept = my_fresh_p.w[0] / my_fresh_p.w[1]
+    intercept = bias / weight[1]
+
+    #ax.plot(boundary_x := np.linspace(0, 2, 2), slope * boundary_x + intercept)
+    #ax.arrow(bias/weight[0], 0, weight[0], weight[1], width=.03, length_includes_head=True)
+
+    plt.show()
+
+
+    error = 0;
+    number_of_predictions = y_test.shape[0]
+    for d in range(number_of_predictions):
+        if y_predictions[d] != y_test[d]:
+            error = error + 1
+    print('---Finished evaluation---')
+    accuracy = (1 - error/number_of_predictions) * 100
+    print('Accuracy: ' + str(accuracy) + '%')
+
 
 #aufgabe_01()
-#aufgabe_02_03()
+aufgabe_02_03()
 aufgabe_04()
+#bias_einbauen()

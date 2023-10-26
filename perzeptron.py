@@ -9,12 +9,17 @@ class Perzeptron:
     global w    #weight
     global r    #lernrate
     global b    #liasterm
+
+    @staticmethod
+    def to_affine(x):
+        return np.append(np.ones_like(x[:, 0]).reshape(-1, 1), x, axis=1)
+
     def __init__(self, w_init, learn_rate):
         self.w = w_init
         self.r = learn_rate
         self.b = 0;
-        print('Perzeptron has been initialised with initial weight of ' + str(self.w)
-              + ' and initial learn rate ' + str(self.r) + '...')
+        #print('Perzeptron has been initialised with initial weight of ' + str(self.w)
+        #      + ' and initial learn rate ' + str(self.r) + '...')
 
     def infer(self, x):
         """
@@ -23,7 +28,7 @@ class Perzeptron:
         RETURN
         y -> Lables in das Perzeptron die Eingabevektoren laut seinen internen Gewichten stecken würde
         """
-        y = np.zeros(x.shape[1])
+        y = np.zeros(x.shape[1], dtype=int)
         for k in range(x.shape[1]):
             y[k] = self.activating_function(x[:, k])
 
@@ -59,8 +64,8 @@ class Perzeptron:
 
     def train(self, x, y):
         #print("Shape x:" + str(x.shape))
-        for k in range(x.shape[1]):#Schnappt sich Eizelne Zeilen aus der Matrix x. Die einzelnen Zeilen haben n Spalten/Features
-            self.weight_new(x[:, k], y[k])#TODO: So richtig? Müssen hier Zeilen oder doch Spalten von X verwendet werden?
+        for k in range(x.shape[0]):#Schnappt sich Eizelne Zeilen aus der Matrix x. Die einzelnen Zeilen haben n Spalten/Features
+            self.weight_new(x[k, :], y[k])#TODO: So richtig? Müssen hier Zeilen oder doch Spalten von X verwendet werden?
             #print('New w is now:' + str(self.w))
 
     @staticmethod
