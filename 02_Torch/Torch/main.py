@@ -1,10 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import sklearn
+
 from perzeptron import Perzeptron
 from sklearn.datasets import load_iris
 from sklearn.decomposition import PCA
 import time
 
+import torch
+from my_torch_model import Perzeptron as my_torch_perzeptron
 def prep_perzeptron():
     plt.rcParams['figure.figsize'] = (4, 4)
 
@@ -97,9 +101,62 @@ def evaluation_auf_Iris():
     end = time.time()
     print("Batch size = 4 took " + str(end - start))
 
+def py_torch_und_iris():
+    if torch.cuda.is_available():
+        print("Cuda available, now strating...")
+    xs, ys = load_iris(return_X_y=True)
+    xs, ys = xs[ys != 2], ys[ys != 2]
+    xs = PCA(2).fit_transform(xs)
 
+    my_torch_p = my_torch_perzeptron()
+    my_torch_p.fit(torch.from_numpy(xs), torch.from_numpy(ys), epochs=4, with_bias=True, mute=True)
+    slope, intercept = my_torch_p.get_decision_boundary()
+    #print("current loss:", Perceptron.loss(ys, P.predict(xs)))
 
+    #compute ideal square plotting area:
+    xmin, xmax = np.min(xs[:,0]), np.max(xs[:,0])
+    ymin, ymax = np.min(xs[:,1]), np.max(xs[:,1])
+    smallest = np.min([xmin, ymin]) - 1
+    biggest = np.max([np.abs(xmax-xmin), np.abs(ymax-ymin)]) + 2
+    xlim = (smallest, smallest + biggest)
+    ylim = (smallest, smallest + biggest)
+
+    fig, ax = plt.subplots()
+    ax.grid()
+    ax.set(xlim = xlim, ylim = ylim)
+    ax.scatter(xs[:,0], xs[:,1], c=ys)
+    ax.plot(boundary_x := np.linspace(smallest, biggest, 2),
+            slope * boundary_x + intercept)
+    plt.show()
+
+def py_torch_und_moon():
+    X, y = sklearn.datasets.make_moons(n_samples=500, noise=0.3, random_state=42)
+    X = PCA(2).fit_transform(X)
+
+    my_torch_p = my_torch_perzeptron()
+    my_torch_p.fit(torch.from_numpy(X), torch.from_numpy(y), epochs=4, with_bias=True, mute=True)
+    slope, intercept = my_torch_p.get_decision_boundary()
+    #print("current loss:", Perceptron.loss(ys, P.predict(xs)))
+
+    #compute ideal square plotting area:
+    xmin, xmax = np.min(X[:,0]), np.max(X[:,0])
+    ymin, ymax = np.min(X[:,1]), np.max(X[:,1])
+    smallest = np.min([xmin, ymin]) - 1
+    biggest = np.max([np.abs(xmax-xmin), np.abs(ymax-ymin)]) + 2
+    xlim = (smallest, smallest + biggest)
+    ylim = (smallest, smallest + biggest)
+
+    fig, ax = plt.subplots()
+    ax.grid()
+    ax.set(xlim = xlim, ylim = ylim)
+    ax.scatter(X[:,0], X[:,1], c=y)
+    ax.plot(boundary_x := np.linspace(smallest, biggest, 2),
+            slope * boundary_x + intercept)
+    plt.show()
 
 #prep_perzeptron()
 #test_minibatch()
-evaluation_auf_Iris()
+#evaluation_auf_Iris()
+#py_torch_und_iris()
+py_torch_und_moon()
+
