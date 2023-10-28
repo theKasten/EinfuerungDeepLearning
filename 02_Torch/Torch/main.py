@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from perzeptron import Perzeptron
 from sklearn.datasets import load_iris
 from sklearn.decomposition import PCA
+import time
 
 def prep_perzeptron():
     plt.rcParams['figure.figsize'] = (4, 4)
@@ -49,29 +50,53 @@ def test_minibatch():
     my_perzeptron = Perzeptron()
 
     # Example data for binary classification:
-    xs = np.array([[1,0.3], [-1,1.1], [0,-1.1], [0.8, -0.9]], dtype='float64')
-    ys = np.array([         0,      0,       0,          1])
+    xs = np.array([[1,0.3], [-1,1.1], [0,-1.1], [0.8, -0.9]])
+    ys = np.array([  0,      0,       0,          1])
 
-    while(loss > 0.1 and iterations < 500):
-        my_perzeptron.perceptron_fit_simd_minibatch(xs, ys,
-                                          learn_rate=0.01,
-                                          batchsize=1)
-        y_pred = my_perzeptron.activating_function(xs)
-        loss = np.sum(y_pred != ys) / len(ys)
-        if(iterations % 50 == 0): # only every 50th iteration:
-            print(iterations, "Gewichtsvektor: ", my_perzeptron.w)
-            print("Anteil falsch klassifiziert: ", loss)
-        iterations += 1
+    #my_perzeptron.fit(xs, ys, 4, True, False)
+    #plot_prediction_with_boundary(xs, ys, epochs=1, with_bias=False)#Mit Bias schlägt multiplikaion in batch prozessing fehl!
+    #plot_prediction_with_boundary(xs, ys, epochs=2, with_bias=False)#Mit Bias schlägt multiplikaion in batch prozessing fehl!
+    #plot_prediction_with_boundary(xs, ys, epochs=3, with_bias=False)#Mit Bias schlägt multiplikaion in batch prozessing fehl!
+    plot_prediction_with_boundary(xs, ys, epochs=4, with_bias=False)#Mit Bias schlägt multiplikaion in batch prozessing fehl!
 
-        print("actual labels:    ", ys)
-        print("predicted labels: ", y_pred)
+def plot_prediction_with_boundary(xs, ys, epochs=200, with_bias=True):
+    P = Perzeptron()
+    P.fit(xs, ys, epochs=epochs, with_bias=with_bias, mute=True)
+    slope, intercept = P.get_decision_boundary()
+    #print("current loss:", Perceptron.loss(ys, P.predict(xs)))
 
-def evaluation_auf_Iris:
+    #compute ideal square plotting area:
+    xmin, xmax = np.min(xs[:,0]), np.max(xs[:,0])
+    ymin, ymax = np.min(xs[:,1]), np.max(xs[:,1])
+    smallest = np.min([xmin, ymin]) - 1
+    biggest = np.max([np.abs(xmax-xmin), np.abs(ymax-ymin)]) + 2
+    xlim = (smallest, smallest + biggest)
+    ylim = (smallest, smallest + biggest)
+
+    fig, ax = plt.subplots()
+    ax.grid()
+    ax.set(xlim = xlim, ylim = ylim)
+    ax.scatter(xs[:,0], xs[:,1], c=ys)
+    ax.plot(boundary_x := np.linspace(smallest, biggest, 2),
+            slope * boundary_x + intercept)
+    plt.show()
+
+def evaluation_auf_Iris():
     xs, ys = load_iris(return_X_y=True)
     xs, ys = xs[ys != 2], ys[ys != 2]
     xs = PCA(2).fit_transform(xs)
 
+
+    start = time.time()
+    plot_prediction_with_boundary(xs, ys, epochs=1)
+    end = time.time()
+    print("Batch size = 1 took " + str(end - start))
+
+    start = time.time()
     plot_prediction_with_boundary(xs, ys, epochs=4)
+    end = time.time()
+    print("Batch size = 4 took " + str(end - start))
+
 
 
 

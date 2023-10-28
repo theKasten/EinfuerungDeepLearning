@@ -1,3 +1,4 @@
+from copyreg import add_extension
 from random import randint
 
 import numpy as np
@@ -5,6 +6,7 @@ import numpy as np
 class Perzeptron:
     global weight    #weight
     global mute
+    global with_bias
     #global r    #lernrate
 
     @staticmethod
@@ -114,15 +116,54 @@ class Perzeptron:
                                                axis=0)"""
 
     def perceptron_fit_simd_minibatch(self, xs, ys, learn_rate=0.01, batchsize=1):
-        weight_vector = np.ones_like(xs[0], dtype="float64")
+        self.weight = np.ones_like(xs[0], dtype="float64")
+        accumulate_weight = self.weight
+        self.show_information("Starting minibatch training...")
         for batch in range(len(xs)//batchsize):
             xs_batch = xs[batch*batchsize:(batch+1)*batchsize]
             ys_batch = ys[batch*batchsize:(batch+1)*batchsize]
-            weight_vector += learn_rate * np.sum( (ys_batch \
-                                                   - self.perceptron_predict_simd2(weight_vector, xs_batch))
+            #print("Batches: \n" + str(xs_batch) + str(ys_batch))
+            #print("Predictions: \n" + str(self.perceptron_predict_simd2(accumulate_weight, xs_batch)))
+            predictions = self.perceptron_predict_simd2(accumulate_weight, xs_batch)
+            #print("Y-Y_pred Vector: " + str(ys_batch - predictions))
+            y_pred_vector = ys_batch - predictions
+            aenderungs_vektoren = np.ones_like(xs_batch)
+            for row in range(xs_batch.shape[0]):
+                #print("Berechne Änderungsvektor: \n")
+                #print(str(y_pred_vector[row]) + "* " + str(xs_batch[row, :]))
+                aenderungs_vektoren[row, :] = y_pred_vector[row] * xs_batch[row, :]
+            #print("Aenderungs vektoren: " + str(aenderungs_vektoren))
+            summe_aenderungen_in_x = np.sum(aenderungs_vektoren, axis=0)
+            #print("Summer aller änderungen: " + str(summe_aenderungen_in_x))
+            self.weight += summe_aenderungen_in_x * learn_rate
+            self.show_information("Trained a batch!")
+
+            """accumulate_weight += learn_rate * np.sum( (ys_batch \
+                                                   - self.perceptron_predict_simd2(accumulate_weight, xs_batch))
                                                   * xs_batch,
-                                                  axis=0)
-        self.weight = weight_vector
+                                                  axis=0)"""
+
 
     def perceptron_predict_simd2(self, weight_vector, xs):
         return np.where(np.tensordot(xs, weight_vector, axes=1) > 0, 1, 0)
+
+    def get_decision_boundary(self):
+        if(self.with_bias):
+            bias, w = - self.weight[0], self.weight[1:]
+            slope = - w[0] / w[1]
+            intercept = bias / w[1]
+        else:
+            slope = - self.weight[0] / self.weight[1]
+            intercept = 0
+        return slope, intercept
+
+    def fit(self, xs, ys, epochs, with_bias, mute):
+        self.mute = mute
+        self.with_bias = with_bias
+        if with_bias:
+            xs = self.to_affine(xs)
+
+        if epochs == 1:
+            self.train(xs, ys)
+        else:
+            self.perceptron_fit_simd_minibatch(xs, ys, batchsize=epochs)
